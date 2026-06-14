@@ -29,20 +29,20 @@ go tool ocipack myapp image.tar.gz
 
 ```
 usage: ocipack [flags] <binary> <output>
-  -tag string            image reference
-  -user string           user[:group] (default "65534")
-  -created string        image timestamp (RFC3339); defaults to now
-  -no-cacerts            skip CA bundle (added by default)
-  -no-tmp                skip /tmp (added by default)
-  -cacerts-path string   CA bundle path (empty = auto-detect)
+  -tag ref               image reference
+  -user user[:group]     (default "65534")
+  -entrypoint arg        entrypoint (repeatable)
+  -cmd arg               cmd (repeatable)
+  -workdir path          working directory
   -env KEY=VALUE         set env var (repeatable)
-  -label KEY=VALUE       set image label (repeatable)
-  -workdir string        working directory
-  -entrypoint arg        entrypoint arg (repeatable)
-  -cmd arg               cmd arg (repeatable)
-  -add-file c:h[:mode]   add file: container path, host path, optional octal mode (repeatable)
+  -add-file c:h[:mode]   add file: container-path:host-path:mode (repeatable)
   -add-dir path[:mode]   add directory, optional octal mode (repeatable)
   -add-link path:target  add symlink (repeatable)
+  -label KEY=VALUE       set image label (repeatable)
+  -created rfc3339       image timestamp; defaults to now
+  -cacerts-path path     CA bundle path (auto-detect when unset)
+  -no-cacerts            skip CA bundle
+  -no-tmp                skip /tmp
 ```
 
 ## Library
