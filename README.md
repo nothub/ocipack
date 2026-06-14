@@ -35,10 +35,10 @@ usage: ocipack [flags] <binary> <output>
   -cmd arg               cmd (repeatable)
   -workdir path          working directory
   -env KEY=VALUE         set env var (repeatable)
+  -label KEY=VALUE       set image label (repeatable)
   -add-file c:h[:mode]   add file: container-path:host-path:mode (repeatable)
   -add-dir path[:mode]   add directory, optional octal mode (repeatable)
   -add-link path:target  add symlink (repeatable)
-  -label KEY=VALUE       set image label (repeatable)
   -created rfc3339       image timestamp; defaults to now
   -cacerts-path path     CA bundle path (auto-detect when unset)
   -no-cacerts            skip CA bundle

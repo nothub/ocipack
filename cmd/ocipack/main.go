@@ -42,14 +42,14 @@ func main() {
 	flag.StringVar(&workdir, "workdir", "", "")
 	var envVars multiFlag
 	flag.Var(&envVars, "env", "")
+	var labels multiFlag
+	flag.Var(&labels, "label", "")
 	var addFiles multiFlag
 	flag.Var(&addFiles, "add-file", "")
 	var addDirs multiFlag
 	flag.Var(&addDirs, "add-dir", "")
 	var addLinks multiFlag
 	flag.Var(&addLinks, "add-link", "")
-	var labels multiFlag
-	flag.Var(&labels, "label", "")
 	var created string
 	flag.StringVar(&created, "created", "", "")
 	var cacertsPath string
@@ -67,10 +67,10 @@ func main() {
   -cmd arg               cmd (repeatable)
   -workdir path          working directory
   -env KEY=VALUE         set env var (repeatable)
+  -label KEY=VALUE       set image label (repeatable)
   -add-file c:h[:mode]   add file: container-path:host-path:mode (repeatable)
   -add-dir path[:mode]   add directory, optional octal mode (repeatable)
   -add-link path:target  add symlink (repeatable)
-  -label KEY=VALUE       set image label (repeatable)
   -created rfc3339       image timestamp; defaults to now
   -cacerts-path path     CA bundle path (auto-detect when unset)
   -no-cacerts            skip CA bundle
