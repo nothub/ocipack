@@ -1,0 +1,34 @@
+name: '🕵️'
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  check:
+    runs-on: codeberg-small
+    steps:
+
+      - run: |
+          printf '# OS:\n'
+          cat /etc/os-release
+          uname -a
+          printf '\n# CPU:\n'
+          lscpu | sed '/^Flags:/Q'
+          printf '\n# MEM:\n'
+          free -ghw
+          printf '\n# DISK:\n'
+          df -hT
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
+
+      - run: go test -race -v -vet 'all' ./...
