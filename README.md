@@ -137,5 +137,5 @@ go build \
 The e2e test requires a container runtime and is gated behind the `integration` build tag:
 
 ```sh
-go test -tags integration -v -race -vet=all ./...
+go test -tags integration -v -race -vet=all -count=1 ./...
 ```
