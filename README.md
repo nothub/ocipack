@@ -45,6 +45,8 @@ usage: ocipack [flags] <binary> <output>
   -cacerts-path path     CA bundle path (auto-detect when unset)
   -no-cacerts            skip CA bundle
   -no-tmp                skip /tmp
+  -tzdata                add /usr/share/zoneinfo (auto-detect from host)
+  -tzdata-path dir       add zoneinfo from dir (implies -tzdata)
 ```
 
 ## Library
