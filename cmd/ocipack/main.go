@@ -69,6 +69,10 @@ func main() {
 	flag.BoolVar(&nocacerts, "no-cacerts", false, "")
 	var notmp bool
 	flag.BoolVar(&notmp, "no-tmp", false, "")
+	var tzdata bool
+	flag.BoolVar(&tzdata, "tzdata", false, "")
+	var tzdataPath string
+	flag.StringVar(&tzdataPath, "tzdata-path", "", "")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, `usage: ocipack [flags] <binary> <output>
@@ -87,6 +91,8 @@ func main() {
   -cacerts-path path     CA bundle path (auto-detect when unset)
   -no-cacerts            skip CA bundle
   -no-tmp                skip /tmp
+  -tzdata                add /usr/share/zoneinfo (auto-detect from host)
+  -tzdata-path dir       add zoneinfo from dir (implies -tzdata)
 `)
 	}
 	flag.Parse()
@@ -186,6 +192,12 @@ func main() {
 
 	if !notmp {
 		img.AddTmp()
+	}
+
+	if tzdata || tzdataPath != "" {
+		if err := img.AddTZData(tzdataPath); err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	for _, e := range envVars {

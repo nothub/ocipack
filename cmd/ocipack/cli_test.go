@@ -262,6 +262,63 @@ func TestCLIAddLink(t *testing.T) {
 	t.Fatal("mylink not found in layer")
 }
 
+func TestCLITZDataFlag(t *testing.T) {
+	out := filepath.Join(t.TempDir(), "image.tar.gz")
+	cmd := exec.Command(ocipackCLI, "-tzdata", "-no-cacerts", "-no-tmp", helloAMD64, out)
+	if b, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("ocipack -tzdata: %v\n%s", err, b)
+	}
+
+	layer := extractLayer(t, out)
+	for name := range layer {
+		if strings.HasPrefix(name, "usr/share/zoneinfo/") {
+			return
+		}
+	}
+	t.Error("no usr/share/zoneinfo/ entries found in layer")
+}
+
+func TestCLITZDataPath(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "UTC"), []byte("UTC data"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	out := filepath.Join(t.TempDir(), "image.tar.gz")
+	cmd := exec.Command(ocipackCLI, "-tzdata-path", dir, "-no-cacerts", "-no-tmp", helloAMD64, out)
+	if b, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("ocipack -tzdata-path: %v\n%s", err, b)
+	}
+
+	layer := extractLayer(t, out)
+	if _, ok := layer["usr/share/zoneinfo/UTC"]; !ok {
+		t.Error("usr/share/zoneinfo/UTC not found in layer")
+	}
+}
+
+func TestCLITZDataAbsent(t *testing.T) {
+	out := filepath.Join(t.TempDir(), "image.tar.gz")
+	cmd := exec.Command(ocipackCLI, "-no-cacerts", "-no-tmp", helloAMD64, out)
+	if b, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("ocipack: %v\n%s", err, b)
+	}
+
+	layer := extractLayer(t, out)
+	for name := range layer {
+		if strings.HasPrefix(name, "usr/share/zoneinfo/") {
+			t.Errorf("unexpected zoneinfo entry %q when -tzdata not passed", name)
+		}
+	}
+}
+
+func TestCLITZDataBadPath(t *testing.T) {
+	out := filepath.Join(t.TempDir(), "image.tar.gz")
+	cmd := exec.Command(ocipackCLI, "-tzdata-path", "/nonexistent/zoneinfo", "-no-cacerts", "-no-tmp", helloAMD64, out)
+	if err := cmd.Run(); err == nil {
+		t.Error("expected non-zero exit for non-existent -tzdata-path")
+	}
+}
+
 // extractOCIConfig follows index → manifest → config blob and returns the raw config JSON.
 func extractOCIConfig(t *testing.T, archivePath string) []byte {
 	t.Helper()
