@@ -26,12 +26,24 @@ func (img *Image) AddCABundle(path string) error {
 		err  error
 	)
 	if path == "" {
-		data, err = readFirst(caBundlePaths)
+		paths := caBundlePaths
+		if p := os.Getenv("SSL_CERT_FILE"); p != "" {
+			paths = append([]string{p}, paths...)
+		}
+		for _, p := range paths {
+			data, err = os.ReadFile(p)
+			if err == nil {
+				break
+			}
+		}
+		if data == nil {
+			return fmt.Errorf("no CA bundle found; tried: %s", strings.Join(paths, ", "))
+		}
 	} else {
 		data, err = os.ReadFile(path)
-	}
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
 	}
 	img.addEntry(File{Path: "etc/ssl/certs/ca-certificates.crt", Type: FileRegular, Data: data, Mode: 0644})
 	return nil
@@ -40,17 +52,4 @@ func (img *Image) AddCABundle(path string) error {
 // AddTmp adds /tmp as a world-writable directory (mode 01777).
 func (img *Image) AddTmp() {
 	img.addEntry(File{Path: "tmp", Type: FileDirectory, Mode: 01777})
-}
-
-func readFirst(paths []string) ([]byte, error) {
-	if p := os.Getenv("SSL_CERT_FILE"); p != "" {
-		paths = append([]string{p}, paths...)
-	}
-	for _, p := range paths {
-		data, err := os.ReadFile(p)
-		if err == nil {
-			return data, nil
-		}
-	}
-	return nil, fmt.Errorf("no CA bundle found; tried: %s", strings.Join(paths, ", "))
 }
