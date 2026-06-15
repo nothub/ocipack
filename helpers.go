@@ -2,7 +2,9 @@ package ocipack
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -52,4 +54,63 @@ func (img *Image) AddCABundle(path string) error {
 // AddTmp adds /tmp as a world-writable directory (mode 01777).
 func (img *Image) AddTmp() {
 	img.addEntry(File{Path: "tmp", Type: FileDirectory, Mode: 01777})
+}
+
+// tzdataPaths is the fallback chain used by AddTZData to find the host zoneinfo directory.
+var tzdataPaths = []string{
+	"/usr/share/zoneinfo",
+	"/usr/lib/zoneinfo",
+	"/usr/share/lib/zoneinfo",
+	"/etc/zoneinfo",
+}
+
+// AddTZData copies the zoneinfo directory tree from the build host into the
+// image at /usr/share/zoneinfo/. Pass "" to auto-detect; pass a path to use
+// a specific directory. Symlinks in the source tree are silently skipped.
+func (img *Image) AddTZData(dir string) error {
+	if dir == "" {
+		paths := tzdataPaths
+		if p := os.Getenv("ZONEINFO"); p != "" {
+			paths = append([]string{p}, paths...)
+		}
+		for _, p := range paths {
+			if info, err := os.Stat(p); err == nil && info.IsDir() {
+				dir = p
+				break
+			}
+		}
+		if dir == "" {
+			return fmt.Errorf("no zoneinfo directory found; tried: %s", strings.Join(paths, ", "))
+		}
+	}
+
+	return filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.Type() == fs.ModeSymlink || (d.Type()&fs.ModeSymlink != 0) {
+			return nil
+		}
+		rel, err := filepath.Rel(dir, path)
+		if err != nil {
+			return err
+		}
+		if rel == "." {
+			return nil
+		}
+		containerPath := "usr/share/zoneinfo/" + filepath.ToSlash(rel)
+		if d.IsDir() {
+			img.addEntry(File{Path: containerPath, Type: FileDirectory, Mode: 0755})
+			return nil
+		}
+		if !d.Type().IsRegular() {
+			return nil
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		img.addEntry(File{Path: containerPath, Type: FileRegular, Data: data, Mode: 0644})
+		return nil
+	})
 }
