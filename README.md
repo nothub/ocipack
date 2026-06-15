@@ -2,7 +2,8 @@
 
 [![Go Reference](https://pkg.go.dev/badge/codeberg.org/fhuebner/ocipack.svg)](https://pkg.go.dev/codeberg.org/fhuebner/ocipack)
 
-Zero-dependency Go library for packaging static binaries in minimal OCI image tarballs (OCI Image Spec 1.0).
+Zero-dependency Go library for packaging static binaries in minimal OCI image tarballs (OCI Image Spec 1.0).  
+Automatically adds ca-certs and tmp dir, even tzdata if you want.
 
 Ideal for:
 
