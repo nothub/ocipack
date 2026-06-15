@@ -117,6 +117,8 @@ go tool ocipack \
   image.tar.gz
 ```
 
+If you use `-tzdata`, the host's zoneinfo tree can change between distro upgrades and break digest stability. Either omit it for reproducible images, or pin it with `-tzdata-path <fixed-dir>`.
+
 ### Go Build
 
 The `go` directive in `go.mod` sets the minimum toolchain version. With the default
