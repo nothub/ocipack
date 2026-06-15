@@ -92,7 +92,7 @@ func main() {
 	flag.Parse()
 
 	if showVersion {
-		fmt.Printf("ocipack %s (OCI Image Spec %s)\n", buildVersion(), ocipack.OCIImageSpecVersion)
+		fmt.Printf("ocipack %s\n", buildVersion())
 		os.Exit(0)
 	}
 

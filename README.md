@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/codeberg.org/fhuebner/ocipack.svg)](https://pkg.go.dev/codeberg.org/fhuebner/ocipack)
 
-Zero-dependency Go library for packaging static binaries in minimal OCI image tarballs.
+Zero-dependency Go library for packaging static binaries in minimal OCI image tarballs (OCI Image Spec 1.0).
 
 Ideal for:
 
@@ -29,6 +29,7 @@ go tool ocipack myapp image.tar.gz
 
 ```
 usage: ocipack [flags] <binary> <output>
+  -version               print version and exit
   -tag ref               image reference
   -user user[:group]     (default "65534")
   -entrypoint arg        entrypoint (repeatable)
