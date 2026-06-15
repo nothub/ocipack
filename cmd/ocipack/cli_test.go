@@ -92,6 +92,21 @@ func readTarGz(t *testing.T, path string) map[string][]byte {
 	return entries
 }
 
+func TestCLIVersion(t *testing.T) {
+	cmd := exec.Command(ocipackCLI, "-version")
+	out, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("ocipack -version: %v", err)
+	}
+	s := string(out)
+	if !strings.HasPrefix(s, "ocipack ") {
+		t.Errorf("unexpected output: %q", s)
+	}
+	if !strings.Contains(s, "OCI Image Spec") {
+		t.Errorf("missing OCI spec info in output: %q", s)
+	}
+}
+
 func TestCLIProducesValidOCITar(t *testing.T) {
 	out := filepath.Join(t.TempDir(), "image.tar.gz")
 	cmd := exec.Command(ocipackCLI, helloAMD64, out)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
@@ -29,7 +30,17 @@ func parseMode(s string, def int64) (int64, error) {
 	return m, nil
 }
 
+func buildVersion() string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok || info.Main.Version == "" || info.Main.Version == "(devel)" {
+		return "dev"
+	}
+	return info.Main.Version
+}
+
 func main() {
+	var showVersion bool
+	flag.BoolVar(&showVersion, "version", false, "")
 	var tag string
 	flag.StringVar(&tag, "tag", "", "")
 	var user string
@@ -61,6 +72,7 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, `usage: ocipack [flags] <binary> <output>
+  -version               print version and exit
   -tag ref               image reference
   -user user[:group]     (default "65534")
   -entrypoint arg        entrypoint (repeatable)
@@ -78,6 +90,11 @@ func main() {
 `)
 	}
 	flag.Parse()
+
+	if showVersion {
+		fmt.Printf("ocipack %s (OCI Image Spec %s)\n", buildVersion(), ocipack.OCIImageSpecVersion)
+		os.Exit(0)
+	}
 
 	if flag.NArg() != 2 {
 		flag.Usage()
