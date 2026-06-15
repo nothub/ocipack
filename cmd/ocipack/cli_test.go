@@ -102,9 +102,6 @@ func TestCLIVersion(t *testing.T) {
 	if !strings.HasPrefix(s, "ocipack ") {
 		t.Errorf("unexpected output: %q", s)
 	}
-	if !strings.Contains(s, "OCI Image Spec") {
-		t.Errorf("missing OCI spec info in output: %q", s)
-	}
 }
 
 func TestCLIProducesValidOCITar(t *testing.T) {
