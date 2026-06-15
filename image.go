@@ -203,8 +203,11 @@ func (img *Image) addEntry(f File) {
 // Build assembles the OCI config, manifest, and optional layer blob.
 // It does not write anything to disk.
 func (img *Image) Build() (*BuildResult, error) {
-	if err := validatePlatform(img.platform); err != nil {
-		return nil, err
+	if img.platform.OS == "" {
+		return nil, fmt.Errorf("platform OS is required")
+	}
+	if img.platform.Architecture == "" {
+		return nil, fmt.Errorf("platform Architecture is required")
 	}
 
 	diffIDs := []string{}
