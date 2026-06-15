@@ -134,10 +134,8 @@ go build \
 
 ## Testing
 
-The test that actually runs a built image (`TestContainerRun`) requires a container runtime and is gated behind the `integration` build tag:
+The e2e test requires a container runtime and is gated behind the `integration` build tag:
 
 ```sh
-go test -tags integration ./...
+go test -tags integration -v -race -vet=all ./...
 ```
-
-All other tests run with the default `go test ./...`.
